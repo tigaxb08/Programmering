@@ -1,0 +1,101 @@
+package semesteropgave;
+// Denne klasse repræsenterer en udbetaling
+public class Withdrawal extends Transaction {
+	
+	// attributerne
+	private int amount;
+	
+	// refererer til andre objekter
+	private Keypad keypad;
+	private CashDispenser cashDispenser;
+	
+	private final static int CANCELED = 6;
+	
+
+	public Withdrawal(int accountName, Screen screen, BankDatabase bankDatabase, Keypad keypad, CashDispenser cashDispenser) {
+		super(accountName, screen, bankDatabase);
+		
+		this.keypad = keypad;
+		this.cashDispenser = cashDispenser;
+	}
+	
+	@Override
+	public void execute() {
+		boolean cashDispensed = false;
+		double availableBalance;
+		
+		BankDatabase bankDatabase = getBankDatabase();
+		Screen screen = getScreen();
+		
+		do {
+			amount = displayMenuOfAmounts();
+			
+			if (amount != CANCELED) {
+				
+				availableBalance =
+						bankDatabase.getAvailableBalance(getAccountName());
+				
+				if (amount <= availableBalance) {
+					
+					if (cashDispenser.isSufficientCashAvailable(amount)) {
+						
+						bankDatabase.debit(getAccountName(), amount);
+						
+						cashDispenser.dispenseCash(amount);;
+						cashDispensed = true;
+						
+						screen.displayMessageLine("\n Dine penge er blevet" + " udbetalt. Tag dem venligst.");
+					}
+					else {
+						screen.displayMessageLine("\n Ikke midler nok på din konto." + "\n Vælg venligst et mindre beløb.");
+					}
+				}
+				else {
+					screen.displayMessageLine("\n Lukker transaktion...");
+					return;
+				}
+			} 
+		}while ( !cashDispensed );
+	}
+		
+		private int displayMenuOfAmounts() {
+		
+			int userChoice = 0;
+			
+			Screen screen = getScreen();
+			
+			int[] amounts = {0, 20, 40, 60, 100, 200};
+			
+			while (userChoice == 0) {
+				screen.displayMessageLine("\nIndtast beløb der skal hæves: ");
+				screen.displayMessageLine("\n1 - $20");
+				screen.displayMessageLine("\n2 - $40");
+				screen.displayMessageLine("\n3 - $60");
+				screen.displayMessageLine("\n4 - $100");
+				screen.displayMessageLine("\n5 - $200");
+				screen.displayMessageLine("\nLuk transaktion");
+				screen.displayMessage("\nVælg et beløb: ");
+				
+				int input = keypad.getInput();
+				
+				switch (input) {
+				
+				case 1: 
+				case 2:
+				case 3:
+				case 4:
+				case 5:
+					userChoice = amounts[input];
+					break;
+				case CANCELED:
+					userChoice = CANCELED;
+					break;
+				default:
+					screen.displayMessageLine("\nUmuligt valg. Prøv igen.");
+				}
+			}
+			
+			return userChoice;
+		}
+	}
+
