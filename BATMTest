@@ -1,0 +1,11 @@
+package semesteropgave;
+
+public class BATMTest {
+
+	public static void main(String[] args) {
+		
+		BATM theBATM = new BATM();
+		theBATM.run();
+	}
+
+}
