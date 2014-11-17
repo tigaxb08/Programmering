@@ -1,0 +1,48 @@
+package semesteropgave;
+
+public class BankDatabase {
+	
+	private Account[] accounts;
+	
+	public BankDatabase() {
+		accounts = new Account[2];
+		accounts[0] = new Account(12345, 54321, 1000.0, 1200.0 );
+		accounts[1] = new Account(98765, 56789, 200.0, 200.0);
+	}
+	
+	private Account getAccount(int accountName){
+		
+		for ( Account currentAccount : accounts ) {
+			
+			if (currentAccount.getAccountName() == accountName)
+				return currentAccount;
+		}
+		return null;
+	}
+	
+	public boolean authenticateUser(int accountName, int userPIN) {
+		
+		Account userAccount = getAccount( accountName);
+		
+		if ( userAccount != null)
+			return userAccount.validatePIN(userPIN);
+		else
+			return false;
+	}
+	
+	public double getAvailableBalance(int accountName) {
+		return getAccount(accountName).getAvailableBalance();
+	}
+	
+	public double getTotalBalance(int accountName) {
+		return getAccount(accountName).getTotalBalance();
+	}
+	
+	public void credit(int accountName, double amount) {
+		getAccount(accountName).credit(amount);
+	}
+	
+	public void debit(int accountName, double amount) {
+		getAccount(accountName).debit(amount);
+	}
+}
