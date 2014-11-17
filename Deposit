@@ -1,0 +1,78 @@
+package semesteropgave;
+
+public class Deposit extends Transaction {
+
+	private double amount; // amount to deposit
+	private Keypad keypad; // reference to keypad
+	private DepositSlot depositSlot; // reference to deposit slot
+	private final static int CANCELED = 0; // constant for cancel option
+	
+	public Deposit(int accountName, Screen screen, BankDatabase bankDatabase, Keypad keypad, DepositSlot depositSlot) {
+		super(accountName, screen, bankDatabase);
+		// TODO Auto-generated constructor stub
+		
+		this.keypad = keypad;
+		this.depositSlot = depositSlot;
+	}
+	
+	@Override
+	public void execute() {
+	
+		BankDatabase bankDatabase = getBankDatabase(); // get reference
+		Screen screen = getScreen(); // get reference
+	
+		amount = promptForDepositAmount(); // get deposit amount from user
+
+		// check whether user entered a deposit amount or canceled
+		if ( amount != CANCELED ) {
+		
+			// request deposit envelope containing specified amount
+			screen.displayMessage(
+					"\nIndsæt venligst en konvolut med det angivne beløb: " );
+			screen.displayDollarAmount( amount );
+			screen.displayMessageLine( "." );
+			
+			// receive deposit envelope
+			boolean envelopeReceived = depositSlot.isEnvelopeReceived();
+			
+			// check whether deposit envelope was received
+			if ( envelopeReceived ) {
+			
+				screen.displayMessageLine( "\nDin konvolut er blevet " +
+						"modtaget.\nBemærk: Pengene vil ikke " +
+						"være tilgængelige indtil vi verificerer beløbet af eventuelt " +
+						"vedlagte kontanter og dine checks går igennem.\n" );
+				// credit account to reflect the deposit
+				bankDatabase.credit( getAccountName(), amount );
+			} // end if
+			else // deposit envelope not received 
+			{
+				screen.displayMessageLine( "\nDu har ikke indsat en " +
+						"konvolut, så BATM maskinen har afsluttet din transaktion." );
+			} // end else
+		}
+		else // user canceled instead of entering amount
+		{
+			screen.displayMessageLine( "\nAfslutter transaktion..." );
+		} // end else
+	} // end method execute
+	
+	// prompt user to enter a deposit amount in cents
+	private double promptForDepositAmount() {
+	
+		Screen screen = getScreen(); // get reference to screen
+		
+		// display the prompt
+		screen.displayMessage( "\nIndtast venligst et depositum i " +
+				"DKK(bitcoins?) (eller tast 0 for at afslutte): " );
+		int input = keypad.getInput(); // receive input of deposit amount
+		
+		// check whether the user canceled or entered a valid amount
+		if ( input == CANCELED )
+			return CANCELED;
+		else {
+			return ( double ) input / 100; // return dollar amount
+		} // end else
+	}
+}
+
