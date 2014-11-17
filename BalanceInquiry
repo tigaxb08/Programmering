@@ -1,0 +1,27 @@
+package semesteropgave;
+
+public class BalanceInquiry extends Transaction {
+
+	public BalanceInquiry(int accountName, Screen screen, BankDatabase bankDatabase) {
+		super(accountName, screen, bankDatabase);
+	}
+	
+	@Override
+	public void execute () {
+		BankDatabase bankDatabase = getBankDatabase();
+		Screen screen = getScreen();
+		
+		double availableBalance =
+				bankDatabase.getAvailableBalance(getAccountName());
+		
+		double totalBalance =
+				bankDatabase.getTotalBalance(getAccountName());
+		
+		screen.displayMessageLine("\nBeløb Information:");
+		screen.displayMessage("\n - Tilgængelig beløb: ");
+		screen.displayDollarAmount(availableBalance);
+		screen.displayMessage("\n - Total Beløb:    ");
+		screen.displayDollarAmount(totalBalance);
+		screen.displayMessageLine("");
+	}
+}
