@@ -1,0 +1,73 @@
+package semesteropgave;
+
+// Denne klasse repræsenterer en hævning
+public class Withdrawal extends Transaction {
+
+	private double amount; // beløb man vil hæve
+	private String userName; // bruger der skal hæve
+	private Keypad keypad; // refererer til tastatur 
+	private Screen screen; // refererer til skærm
+	private BankDatabase bankDatabase; // refererer til databasen
+	private final static int CANCELED = 0; // konstant til at lukke transaktionen
+	
+	public Withdrawal(String userName, Screen screen, BankDatabase bankDatabase, Keypad keypad) {
+		this.userName = userName;
+		this.keypad = keypad;
+		this.bankDatabase = bankDatabase;
+		this.screen = screen;
+	}
+	
+		
+	@Override
+	// metoden sørger for at brugeren indtaster et beløb
+	public double prompt() {
+		
+		// udskriver nedenstående tekst
+		screen.displayMessage( "\nIndtast venligst et beløb i " + "BitCoins (eller tast 0 for at afslutte): " );
+		double inputd = keypad.getInput(); // Modtager oplysninger om det indsatte beløb
+		
+		// Undersøger om brugeren annullerede eller indtastede et gyldigt beløb
+		if ( inputd == CANCELED )
+			return CANCELED;
+		else {
+			return ( double ) inputd; //Retunerer BitCoin beløb
+		} 
+	} 
+
+	@Override
+	public void execute() {
+		
+		amount = prompt(); // sørger for at brugeren indtaster beløb
+
+		// tjekker om brugeren indtastede beløb, som ikke er 0
+		if ( amount != CANCELED)
+		{
+			// Hent saldo på kontoen
+			double totalBalance = bankDatabase.getTotalBalance(userName);
+			
+			//  sørger for at brugerens saldo er større end det indtastede beløb
+			if (amount <= totalBalance) {
+				
+				bankDatabase.debit( userName, amount ); // Træk beløbet fra den aktive bruger
+				
+				// opdaterer saldoen på kontoen i forhold til det hævede beløb
+				screen.displayMessageLine("\nPengene er blevet hævet.");
+				double totalDkr= (totalBalance-amount)*bankDatabase.getBtcRate();
+				screen.displayMessage( "\nNy balance: " );
+				screen.displayBtcAmount(totalBalance-amount);
+				screen.displayDkrAmount(totalDkr);
+			}
+			else {
+				// brugerens saldo er for lille
+				screen.displayMessageLine( "\nDu har ikke nok BitCoins på din konto" + "\n\nPrøv venligst med et mindre beløb" );
+			}
+
+		}
+		else // brugeren annullerede i stedet for at indtaste beløb
+		{
+			screen.displayMessageLine( "\nAfslutter transaktion..." );
+		} 
+		
+	} // afslutter metode
+}
+
