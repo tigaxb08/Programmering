@@ -1,48 +1,108 @@
 package semesteropgave;
 
+import java.util.ArrayList;
+
 public class BankDatabase {
 	
-	private Account[] accounts;
+	private static ArrayList<User> users = new ArrayList<User>(); // Arraylist til opbevaring af brugere
+	private static double btcRate = 2030.88; // Variabel der sætter standard vekselkurs på BitCoins
 	
+	// Metode der initialiserer de oprettede brugere
 	public BankDatabase() {
-		accounts = new Account[2];
-		accounts[0] = new Account(12345, 54321, 1000.0, 1200.0 );
-		accounts[1] = new Account(98765, 56789, 200.0, 200.0);
+		User user0 = new User("88888888","1234abcd", 0.0, true); // Administrator
+		User user1 = new User("toja13ac@student.cbs.dk", "Tobias93", 1.0, false); // Bruger
+		User user2 = new User("jogr14ac@student.cbs.dk", "Joachim94", 1.0, false); // Bruger
+		User user3 = new User("alol13ac@student.cbs.dk", "Alexei13", 1.0, false); // Bruger
+		User user4 = new User("irba08ac@student.cbs.dk", "Irina08", 1.0, false); // Bruger
+		User user5 = new User("jeje14ac@student.cbs.dk", "Jens94", 1.0, false); // Bruger
+		User user6 = new User("modo14ac@student.cbs.dk", "Morten94", 1.0, false); // Bruger
+		
+		// Tilføjer administrator og samtlige brugere
+		users.add(user0);
+		users.add(user1);
+		users.add(user2);
+		users.add(user3);
+		users.add(user4);
+		users.add(user5);
+		users.add(user6);
 	}
 	
-	private Account getAccount(int accountName){
+	// Metode der kaldes fra admin-klassen til at tilføje brugere til ArrayListen
+	public void addUser(String userName, String password) {
+		users.add(new User(userName, password, 1.0, false)); // Tilføjer en bruger med angivne navn, password, fast startsaldo og false boolean til arraylisten
+	}
+	
+	// Henter bruger objektet som indeholder det indtastede brugernavn
+	private User getUser(String userName){
 		
-		for ( Account currentAccount : accounts ) {
+		// Løkke gennem brugere for at finde brugernavn
+		for ( User currentAccount : users ) {
 			
-			if (currentAccount.getAccountName() == accountName)
+			// Returnerer hvis brugeren findes
+			if (currentAccount.getUserName().equals(userName))
 				return currentAccount;
 		}
-		return null;
+		return null; // Returnerer null hvis ingen brugere kan findes
 	}
 	
-	public boolean authenticateUser(int accountName, int userPIN) {
+	// Laver ny bruger i ArrayListen 
+	public static void setUsers(ArrayList<User> users) {
+		BankDatabase.users = users;
+	}
+	
+	// Afgør om brugernavn og password matcher noget i databasen
+	public boolean authenticateUser(String userName, String userPassword) {
 		
-		Account userAccount = getAccount( accountName);
+		User userAccount = getUser(userName); // Forsøger at hente brugeren med brugernavnet
 		
+		// Hvis brugeren eksisterer, skal resultat af User metode validatePassword returneres 
 		if ( userAccount != null)
-			return userAccount.validatePIN(userPIN);
+			return userAccount.validatePassword(userPassword);
 		else
+			return false; // Bruger ikke fundet 
+	}
+	
+	// Afgør kun om selve brugernavn findes i databasen
+	public boolean authenticateUsername(String user) {
+		User userAccount = getUser(user);
+		
+		// Hvis brugeren eksisterer skal true returneres
+		if (userAccount != null) {
+			return true;
+		}
+		// Hvis bruger ikke eksisterer skal false returneres
+		else {
 			return false;
+		}
 	}
 	
-	public double getAvailableBalance(int accountName) {
-		return getAccount(accountName).getAvailableBalance();
+	// Returnerer den totale balance på kontoen
+	public double getTotalBalance(String userName) {
+		return getUser(userName).getTotalBalance();
 	}
 	
-	public double getTotalBalance(int accountName) {
-		return getAccount(accountName).getTotalBalance();
+	// Krediterer et beløb på kontoen
+	public void credit(String userName, double amount) {
+		getUser(userName).credit(amount);
 	}
 	
-	public void credit(int accountName, double amount) {
-		getAccount(accountName).credit(amount);
+	// Debiterer et beløb på kontoen
+	public void debit(String userName, double amount) {
+		getUser(userName).debit(amount);
 	}
 	
-	public void debit(int accountName, double amount) {
-		getAccount(accountName).debit(amount);
+	// Returner nuværende vekselkurs
+	public double getBtcRate() {
+		return btcRate;
+	}
+	
+	// Sæt ny bitcoin kurs 
+	public void setBtcRate(double newRate) {
+		btcRate = newRate;
+	}
+
+	// Returnerer brugere 
+	public ArrayList<User> getUsers() {
+		return users;
 	}
 }
