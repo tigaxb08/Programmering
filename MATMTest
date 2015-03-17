@@ -1,0 +1,10 @@
+package semesteropgave;
+
+public class MATMTest {
+	//main-metode til at starte MATM-app'en
+	public static void main(String[] args) {
+		
+		MATM theMATM = new MATM();
+		theMATM.run();
+	}
+}
