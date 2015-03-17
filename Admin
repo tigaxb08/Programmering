@@ -1,9 +1,5 @@
 package semesteropgave;
-/**
- * 
- * Udarbejdet af Alexei og Irina
- *
- */
+
 public class Admin {
 	Screen screen = new Screen(); // Laver et objekt af skærm
 	Keypad keypad = new Keypad(); // Laver et objekt af keypad
