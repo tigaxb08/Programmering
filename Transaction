@@ -5,3 +5,6 @@ public abstract class Transaction {
 	abstract public void execute(); // udfører transaktionen i subklasserne
 	abstract public double prompt(); // udfører en forespørgsel	
 }
+
+
+//komtestedsdsad
