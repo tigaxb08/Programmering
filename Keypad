@@ -1,20 +1,58 @@
 package semesteropgave;
 
-import java.util.Scanner;
+import java.util.InputMismatchException; // exceptions til at opfange forkert brugerinput
+import java.util.Scanner; // importerer Scanner der gør det muligt at indtaste fra tastatur
 
 public class Keypad {
 
-	private Scanner input;
+	// læsere af brugerinput
+	private Scanner input; 
+	private Scanner inputs;
+	private Scanner inputd;
 	
+	// konstruktør der initialiserer scannerne
 	public Keypad() {
 		input = new Scanner(System.in);
+		inputs = new Scanner(System.in);
+		inputd = new Scanner(System.in);
 	}
-	
+	// returnerer integer indtastet af bruger
 	public int getInput() {
-		return input.nextInt();
+		// while loop der kører så længe der ikke er indtastet en integer
+		int val = 0;
+		boolean loop = true;
+		while (loop) {
+			try {
+				val = input.nextInt();
+				loop = false;
+			} 		
+			catch (InputMismatchException ime) {
+			
+				System.err.printf("Ugyldigt forsøg. Prøv igen.");
+				input.nextLine();
+			}
+		}
+		return val;
+	}
+	// returnerer String indtastet af bruger
+	public String getInputs() {
+		return inputs.nextLine();
 	}
 	
-	public String getInput2() {
-		return input.next();
+	// returnerer double indtastet af bruger
+	public double getInputd() {
+		// while loop der kører så længe der ikke er indtastet en double
+		double var = 0.0;
+		boolean loop = true;
+		while (loop) {
+			try {
+				var = inputd.nextDouble();
+				loop = false;
+			} catch (InputMismatchException ime) {
+				System.err.printf("Ugyldigt forsøg. Prøv igen.");
+				inputd.nextLine();
+			}
+		}
+			return var;
 	}
 }
