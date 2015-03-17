@@ -1,20 +1,25 @@
 package semesteropgave;
 
-import java.util.Scanner;
-
-public class Keypad {
-
-	private Scanner input;
+public class Screen {
 	
-	public Keypad() {
-		input = new Scanner(System.in);
+	// metode der udskriver String
+	public void displayMessage(String message){
+		System.out.printf("%s",message);
 	}
 	
-	public int getInput() {
-		return input.nextInt();
+	// metoder der udskriver String på ny linje
+	public void displayMessageLine(String message){
+		System.out.printf("%s\n",message);
 	}
 	
-	public String getInput2() {
-		return input.next();
-	}
+	// metode der udskriver BitCoin beløb
+	public void displayBtcAmount(double amount) {
+		System.out.printf("\nBTC %,.2f", amount);
+	} 
+	
+	// metode der udskriver beløb i danske kroner
+	public void displayDkrAmount(double amount)
+	{
+	System.out.printf(" (DKR %,.2f)\n", amount);
+	} 
 }
