@@ -1,0 +1,228 @@
+package semesteropgave;
+/**
+ * 
+ * Udarbejdet af Alexei og Tobias
+ *
+ */
+
+public class MATM {
+
+	private boolean userAuthenticated; // om bruger er godkendt
+	private boolean adminAuthenticated; // om administrator er godkendt
+	private String currentUserName; // nuværende brugers e-mail-adresse
+	private Admin admin; // administrator for MATM'en
+	private Screen screen; // skærm for MATM'en
+	private Keypad keypad; // tastaturet for MATM'en
+	private BankDatabase bankDatabase; // Databasen for MATM'en
+	
+	// bruger menuens konstanter 
+	private static final int BALANCE_INQUIRY = 1; 
+	private static final int WITHDRAWAL = 2;
+	private static final int DEPOSIT = 3;
+	private static final int TRANSFER = 4;
+	private static final int EXIT = 5;
+	
+	// administrator menuens konstanter
+	private static final int NEW_RATE = 1; 
+	private static final int ADD_USER = 2; 
+	private static final int DELETE_USER = 3;
+	private static final int SHOW_USERS = 4;
+	private static final int RICHEST_POOREST = 5;
+	private static final int EXITADMIN = 6; 
+	
+	// MATM'ens konstruktører initialiserer instansvariable
+	public MATM() {
+		userAuthenticated = false; // Bruger er ikke godkendt
+		adminAuthenticated = false; // Administrator er ikke godkendt
+		currentUserName = "0"; // bruger ikke logget ind
+		bankDatabase = new BankDatabase(); // opretter objekt af database
+		admin = new Admin(bankDatabase); // laver objekt af admin med bankDatase parameter
+		screen = new Screen(); // opretter objekt af skærm
+		keypad = new Keypad(); // opretter objekt af tastatur
+	}
+	
+	// starter MATM app'en
+	public void run() {
+		// while loop der automatisk køres
+		while (true) {
+			// while loop der kører så længe hverken bruger eller administrator ikke er logget ind
+			while (!userAuthenticated && !adminAuthenticated) {
+				screen.displayMessageLine("------------------------------");
+				screen.displayMessageLine("Velkommen");
+				authenticateUser(); // metode til at godkende bruger eller administrator
+			}
+			
+			// Hvis admin er godkendt
+			if(adminAuthenticated && !userAuthenticated)
+			{
+			performActions(); // Admin er godkendt til handlinger
+			adminAuthenticated = false; // Nulstiller inden næste session
+			currentUserName = "0"; // Nulstiller inden næste session
+			}
+			
+			// Hvis bruger er godkendt
+			if(userAuthenticated && !adminAuthenticated)
+			{
+			performTransactions(); // Bruger er godkendt til handlinger
+			userAuthenticated = false; // Nulstiller inden næste session
+			currentUserName = "0"; // Nulstiller inden næste session
+			}
+		}
+	}
+	// bruger skal godkendes
+	public void authenticateUser() {
+		screen.displayMessage("\nIndtast CBS-email-adresse: ");
+		String userName = keypad.getInputs(); // CBS-e-mail-adresse godkendes
+		screen.displayMessage("\nIndtast dit password: ");
+		String password = keypad.getInputs(); // password godkendes
+		
+		// tjekker de indtastede Strings med database
+		userAuthenticated = bankDatabase.authenticateUser(userName, password);
+		
+		// hvis userName og pin svarer til administratorens
+		if (userAuthenticated && userName.equals("88888888")) {
+			currentUserName = userName; // gemmer nuværende brugers e-mail-adresse
+			adminAuthenticated = true; // administrator er godkendt
+			userAuthenticated = false; // bruger afvist
+		}
+		
+		// hvis bruger er godkendt
+		if (userAuthenticated && !adminAuthenticated)
+		{
+		currentUserName = userName; // gemmer nuværende brugers e-mail-adresse
+		}
+		
+		// hverken admin eller bruger er godkendt
+		if (!userAuthenticated && !adminAuthenticated)
+		{
+		screen.displayMessageLine("Forkert CBS-email-adresse \neller password.\nPrøv venligst igen");
+		}
+ 
+	}
+	// metode vis bruger menuen og gennemfør transaktionstype
+	private void performTransactions() {
+		Transaction currentTransaction = null; // lokal variabel oprettes til at gemme valg af transaktionstype
+		boolean userExited = false; // bruger har ikke valgt at afslutte
+		// while loop der kører så længe bruger ikke har valgt at afslutte
+		while (!userExited) {
+			// vis bruger menuen
+			int mainMenuSelection = displayMainMenu(); // laver menuen til en tal-variabel 
+			
+			// brugeren vælger transaktiontype
+			switch (mainMenuSelection) {
+			case BALANCE_INQUIRY:
+			case WITHDRAWAL:
+			case DEPOSIT:
+			case TRANSFER:
+				// initialiserer som nyt objekt af den valgte type
+				currentTransaction = createTransaction(mainMenuSelection);
+				// udfører transaktion
+				currentTransaction.execute();
+				break;
+			// brugeren afslutter
+			case EXIT:
+				screen.displayMessageLine("\nGår ud af systemet...");
+				userExited = true;
+				break;
+			// brugeren indtastede ugyldigt tal
+			default:
+				screen.displayMessageLine("\nIndtast venligst et gyldigt \ntal.");
+				break;
+			}
+		}
+	}
+	
+	// Vis administrator menu og gennemfør handlinger
+	private void performActions()
+	{
+		boolean userExited = false; // administrator har ikke valgt at afslutte
+		
+		// while loop der kører når administrator ikke har afsluttet
+		while (!userExited)
+		{
+		
+			// vis administrator menu
+			int adminMenuSelection = displayAdminMenu();
+		
+			// administratoren vælger handling
+			switch (adminMenuSelection)
+			{
+		
+				// administrator vælger en de disse handlinger
+				case NEW_RATE:
+					admin.newBtcRate();
+					break;
+				case ADD_USER:
+					admin.addUser();
+					break;
+				case DELETE_USER:
+					admin.deleteUser();
+					break;
+				case SHOW_USERS:
+					admin.showUsers();
+					break;
+				case RICHEST_POOREST:
+					admin.richestPoorest();
+					break;
+				// administrator afslutter
+				case EXITADMIN: 
+					screen.displayMessageLine("\nGår ud af systemet...");
+					userExited = true;
+					break;
+				// administrator indtastede ugyldigt tal
+				default: 
+					screen.displayMessageLine("\nIndtast venligst et gyldigt \ntal.");
+					break;
+			} 
+		} 
+	}
+	// viser bruger menuen
+	private int displayMainMenu() {
+		
+		screen.displayMessageLine("\nHovedmenu:");
+		screen.displayMessageLine("1 - Vis min balance");
+		screen.displayMessageLine("2 - Hæv penge");
+		screen.displayMessageLine("3 - Indsæt penge");
+		screen.displayMessageLine("4 - Overfør til anden bruger");
+		screen.displayMessageLine("5 - Afslut\n");
+		screen.displayMessage("Tast valg: ");
+		return keypad.getInput(); // returnerer input fra bruger
+	}
+	
+	// viser administrator menuen
+	private int displayAdminMenu()
+	{
+		screen.displayMessageLine("\nAdministrator menu:");
+		screen.displayMessageLine("1 - Indtast ny vekselskurs");
+		screen.displayMessageLine("2 - Tilføj bruger");
+		screen.displayMessageLine("3 - Slet bruger");
+		screen.displayMessageLine("4 - Vis brugere");
+		screen.displayMessageLine("5 - Vis rigeste og fattigste \n    bruger");
+		screen.displayMessageLine("6 - Aflsut\n");
+		screen.displayMessage("Tast valg: ");
+		return keypad.getInput(); // returnerer input fra administratoren
+	} 
+	// returnerer objekt af valgte transaktions underklasse
+	private Transaction createTransaction(int type) {
+		Transaction temp = null; // midlertidig transaktions variabel
+		
+		// beslutter hvilken type transaktion der skal udføres
+		switch (type) {
+			
+		case BALANCE_INQUIRY: // laver ny "saldotjek" transaktion
+			temp = new BalanceInquiry(currentUserName, screen, bankDatabase);
+			break;
+		case WITHDRAWAL: // laver ny "hæve" transaktion
+			temp = new Withdrawal(currentUserName, screen, bankDatabase, keypad);
+			break;
+		case DEPOSIT: // laver ny "indsætte" transaktion
+			temp = new Deposit(currentUserName, screen, bankDatabase, keypad);
+			break;
+		case TRANSFER: // laver ny "overførsels" transaktion
+			temp = new Transfer(currentUserName, screen, bankDatabase, keypad);
+			break;
+		}
+		// returnerer det nye objekt
+		return temp; 
+	}
+}
