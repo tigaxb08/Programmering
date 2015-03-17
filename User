@@ -1,0 +1,58 @@
+package semesteropgave;
+
+public class User {
+
+	private String userName; // CBS e-mail-adresse
+	private String password; // password til godkendelse
+	private double totalBalance; // saldo
+	private boolean isAdmin; // boolean der afgører om bruger samtidigt er administrator
+	
+	// kontrukstør for bruger der initialiserer attributter 
+	public User(String userName, String password, double totalBalance, boolean isAdmin) {
+		this.userName = userName;
+		this.password = password;
+		this.totalBalance = totalBalance;
+		this.setAdmin(isAdmin);
+	}
+
+	// afgører om indtastet password matcher password'et for brugeren
+	public boolean validatePassword(String userPassword) {
+		if (userPassword.equals(password))
+			return true;
+		else
+			return false;
+	}
+	// returnerer password
+	public String getPassword() {
+		return password;
+	}
+	// metode der sætter password'et
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	// returnerer saldoen på kontoen
+	public double getTotalBalance() {
+		return totalBalance;
+	}
+	// indsætter BitCoins på konto
+	public void credit(double amount) {
+		totalBalance += amount;
+	}	
+	// hæver BitCoins på konto
+	public void debit(double amount) {
+		totalBalance -= amount;
+	}
+	// retunerer brugernavn
+	public String getUserName() {
+		return userName;
+	}
+	// returnerer boolean for om brugeren er administrator eller ej
+	public boolean isAdmin() {
+		return isAdmin;
+	}
+
+	// metode der sætter bruger til administrator eller ej
+	public void setAdmin(boolean isAdmin) {
+		this.isAdmin = isAdmin;
+	}
+}
