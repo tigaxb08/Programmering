@@ -1,41 +1,7 @@
 package semesteropgave;
 
+// dette er superklassen der repræsenterer en transaktion
 public abstract class Transaction {
-	
-	private int accountName; //indikerer hvilken persons konto det er
-	private Screen screen;
-	private BankDatabase bankDatabase;
-	
-	public Transaction(int accountName, Screen screen, BankDatabase bankDatabase) {
-		this.accountName = accountName;
-		this.screen = screen;
-		this.bankDatabase = bankDatabase;
-	}
-	// alle setters og getters lavet automatisk
-	public int getAccountName() {
-		return accountName;
-	}
-
-	public void setAccountName(int accountName) {
-		this.accountName = accountName;
-	}
-
-	public Screen getScreen() {
-		return screen;
-	}
-
-	public void setScreen(Screen screen) {
-		this.screen = screen;
-	}
-
-	public BankDatabase getBankDatabase() {
-		return bankDatabase;
-	}
-
-	public void setBankDatabase(BankDatabase bankDatabase) {
-		this.bankDatabase = bankDatabase;
-	}
-	
-	// Laver transaktionen
-	abstract public void execute();
+	abstract public void execute(); // udfører transaktionen i subklasserne
+	abstract public double prompt(); // udfører en forespørgsel	
 }
