@@ -1,27 +1,36 @@
 package semesteropgave;
 
+// underklasse til superklassen Transaction
 public class BalanceInquiry extends Transaction {
+	
+	private String userName; // brugernavn
+	private Screen screen; // reference til skærm
+	private BankDatabase bankDatabase; // reference til databasen
 
-	public BalanceInquiry(int accountName, Screen screen, BankDatabase bankDatabase) {
-		super(accountName, screen, bankDatabase);
+	// kontruktør
+	public BalanceInquiry(String userName, Screen screen, BankDatabase bankDatabase) {
+		this.userName = userName;
+		this.screen = screen;
+		this.bankDatabase = bankDatabase;
 	}
 	
+	// udfører transaktionen, der viser saldoen
 	@Override
-	public void execute () {
-		BankDatabase bankDatabase = getBankDatabase();
-		Screen screen = getScreen();
+	public void execute () {		
+		double totalBalance = bankDatabase.getTotalBalance(userName); // henter saldo oplysninger fra den involverede bruger 
+		double totalDkr = totalBalance*bankDatabase.getBtcRate(); // omregner til danske kroner
 		
-		double availableBalance =
-				bankDatabase.getAvailableBalance(getAccountName());
-		
-		double totalBalance =
-				bankDatabase.getTotalBalance(getAccountName());
-		
+		// udskriver informationerne
 		screen.displayMessageLine("\nBeløb Information:");
-		screen.displayMessage("\n - Tilgængelig beløb: ");
-		screen.displayDollarAmount(availableBalance);
-		screen.displayMessage("\n - Total Beløb:    ");
-		screen.displayDollarAmount(totalBalance);
-		screen.displayMessageLine("");
+		screen.displayMessage("\nTotal Beløb:    ");
+		screen.displayBtcAmount(totalBalance);
+		screen.displayDkrAmount(totalDkr);
+	}
+	
+	// tom metode, fordi ikke er brug for en forespørgsel
+	@Override // overskriver metoden fra superklassen med klassens egen
+	public double prompt() {
+		double x=0;
+		return x;
 	}
 }
