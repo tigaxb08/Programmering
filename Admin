@@ -1,0 +1,124 @@
+package semesteropgave;
+/**
+ * 
+ * Udarbejdet af Alexei og Irina
+ *
+ */
+public class Admin {
+	Screen screen = new Screen(); // Laver et objekt af skærm
+	Keypad keypad = new Keypad(); // Laver et objekt af keypad
+	BankDatabase bankDatabase; // refererer til BankDatase
+	
+	public Admin(BankDatabase bankDatabase){
+		this.bankDatabase = bankDatabase;
+	}
+	
+	// administrator metode til at sætte ny vekselskurs kurs
+	public void newBtcRate()
+	{
+		double currentRate = bankDatabase.getBtcRate(); // gemmer nuværende vekselkurs fra databasen i en lokal variabel
+		screen.displayMessageLine("\nNuværende BitCoin vekselkurs: " + currentRate); // udskriver nuværende vekselkurs
+		screen.displayMessage("\nIndtast ny BitCoin vekselskurs: ");
+		double newRate = keypad.getInputd(); // gemmer administrators input i en lokal variabel
+		bankDatabase.setBtcRate(newRate); // ændrer vekselkursen i databasen
+		screen.displayMessageLine("Ny BitCoin vekselkurs indlæst"); // udskriver den nye vekselkurs
+	} 
+	
+	// administrator metode til at oprette ny bruger
+	public void addUser()
+	{
+			screen.displayMessageLine("\nCBS-email-adresse:"); // spørger administrator om CBS e-mail-adresse
+			String user = keypad.getInputs(); // gemmer input fra administrator
+	
+			screen.displayMessageLine("Password:"); // spørger administrator om brugers password
+			String password = keypad.getInputs(); // gemmer input fra administrator
+	
+			// If/Else der sørger for at password mindst er 6 tegn og indeholder tal og bogstaver
+			if (user.endsWith("cbs.dk") && password.length()>=6 && password.matches("[A-Za-z0-9]+")) {
+				bankDatabase.getUsers();
+				bankDatabase.addUser(user, password); // tilføjer bruger en til brugerdatabasen
+				screen.displayMessageLine("Bruger tilføjet.");
+			}
+			else
+			{
+				screen.displayMessageLine("CBS e-mail-adresse skal ende på 'cbs.dk'. \nPassword'et skal indholde \nmindst 6 tegn, må kun indeholde "
+						+ "\nbogstaver og symboler, \n og indeholde stort bogstav");
+			}
+	}
+	// administrator metode til at slette bruger
+	public void deleteUser() {
+		screen.displayMessageLine("\nCBS-email-adresse:"); // spørger administrator om CBS e-mail-adresse
+		String user = keypad.getInputs(); // gemmer input fra administrator
+		screen.displayMessageLine("\nPassword:"); // spørger administrator om brugers password
+		String password = keypad.getInputs(); // gemmer input fra administrator
+		
+		// if der sørger for at adminstrator ikke kan slettes
+		if(user.equals("88888888")){
+			screen.displayMessageLine("Du kan ikke slette administratoren.");
+		}
+		// else der kører når administrator ikke prøver at slette administrator
+		else {
+		User tempUser = null; // laver lokal variabel
+		
+		// for loop der kører igennem alle brugerne
+		for(User bruger : bankDatabase.getUsers()){
+			// if loop der finder bruger, som skal slettes
+			if(bruger.getUserName().equals(user) && bruger.getPassword().equals(password)){
+				tempUser = bruger;
+				bankDatabase.getUsers().remove(tempUser); // bruger fjernes
+				screen.displayMessageLine("\nBruger slettet.");
+				break;
+			}
+		}
+	}
+}
+	
+	// administrator metode til at vise brugere
+	public void showUsers() {
+		// for-loop der kører igennem alle brugere
+		for(User user : bankDatabase.getUsers())
+		{
+			// if loop der sørger for at alle brugere bliver udskrevet, og at administrator ikke gør
+			if(user.isAdmin() == false) {
+				screen.displayMessage("\n\nE-mail adresse: \n" + user.getUserName() + "\nBalance: " + user.getTotalBalance() + " BitCoins.\n");
+			}
+		}	
+	}
+	// administrator metode til at vise fattigste og rigeste bruger
+	public void richestPoorest() {
+		// laver lokale variable og sætter dem lig 0
+		User richestUser = null;
+		double largestBalance = 0;
+		
+		// for loop der kører igennem alle brugere
+		for(User user : bankDatabase.getUsers())
+		{
+			// if loop der henter bruger med størst saldo
+			if(user.getTotalBalance() > largestBalance && user.isAdmin() == false)
+			{
+				largestBalance = user.getTotalBalance();
+				richestUser = user;
+			}
+		}
+		
+		// udskriver rigeste bruger
+		screen.displayMessageLine("Bruger: " + richestUser.getUserName() + " - Saldo: " + richestUser.getTotalBalance());
+		 
+		User poorestUser = null;
+		double smallestBalance = Double.MAX_VALUE; // laver lokal variabel som sættes lig med den største saldo
+		
+		// for loop der kører igennem alle brugerne
+		for(User user : bankDatabase.getUsers())
+		{
+			// if loop der henter brugeren med mindste saldo
+			if(user.getTotalBalance() < smallestBalance && user.isAdmin() == false)
+			{
+				smallestBalance = user.getTotalBalance();
+				poorestUser = user;
+			}
+		}
+		// udskriver fattigste bruger
+		screen.displayMessageLine("Bruger: " + poorestUser.getUserName() + " - Saldo: " + poorestUser.getTotalBalance());
+	}
+
+} // Klassen afsluttes
